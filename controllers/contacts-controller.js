@@ -20,7 +20,7 @@ const getById = async (req, res) => {
 const addContact = async (req, res) => {
     const { error } = contactSchema.validate(req.body);
     if (error) {
-        throw HttpError(400, "missing required name field")
+        throw HttpError(400, error.message)
     }
     const result = await contactService.add(req.body);
     res.status(201).json(result);
