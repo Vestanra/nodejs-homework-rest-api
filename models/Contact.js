@@ -19,7 +19,12 @@ const contactSchemaMngs = new Schema({
         type: Boolean,
         default: false,
     },
-}, { versionKey: false });
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: true,           
+    }
+}, { versionKey: false, timestamps: true, });
 
 contactSchemaMngs.post("save", handleSaveError);
 contactSchemaMngs.pre("findOneAndUpdate", preUpdate);
