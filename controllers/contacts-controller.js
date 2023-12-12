@@ -1,15 +1,23 @@
 import { HttpError } from "../helpers/index.js";
 import { ctrlWrapper } from "../decorators/index.js";
-import { Contact, contactFavoriteSchemaJoi, contactSchemaJoi, contactUpdateSchemaJoi } from "../models/Contact.js";
+import { Contact } from "../models/Contact.js";
 
 const listContacts = async (req, res) => {
-    const result = await Contact.find();
+    const { _id: owner } = req.user;
+    const { page = 1, limit = 10, favorite } = req.query;
+    const skip = (page - 1) * limit;
+    const query = {owner}
+    if (favorite === "true") {
+        query.favorite = true;
+    }
+    const result = await Contact.find(query, "-createdAt -updatedAt", { skip, limit }).populate("owner", "_id email subscription");
     res.json(result);
 };
 
 const getById = async (req, res) => {
     const { id } = req.params;
-    const result = await Contact.findById(id);
+    const { _id: owner } = req.user;
+    const result = await Contact.findOne({ _id: id, owner });
     if (!result) {
         throw HttpError(404, "Not found")
     }
@@ -17,21 +25,15 @@ const getById = async (req, res) => {
 };
 
 const addContact = async (req, res) => {
-    const { error } = contactSchemaJoi.validate(req.body);
-    if (error) {
-        throw HttpError(400, error.message)
-    }
-    const result = await Contact.create(req.body);
+    const { _id: owner } = req.user;
+    const result = await Contact.create({ ...req.body, owner });
     res.status(201).json(result);
 };
 
 const updateContact = async (req, res) => {
-    const { error } = contactUpdateSchemaJoi.validate(req.body);
-    if (error) {
-        throw HttpError(400, error.message);
-    }
     const { id } = req.params;
-    const result = await Contact.findByIdAndUpdate(id, req.body);
+    const { _id: owner } = req.user;
+    const result = await Contact.findOneAndUpdate({ _id: id, owner }, req.body);
     if (!result) {
         throw HttpError(404, "Not found")
     }
@@ -40,7 +42,8 @@ const updateContact = async (req, res) => {
 
 const removeContact = async (req, res, next) => {
     const { id } = req.params;
-    const result = await Contact.findByIdAndDelete(id);
+    const { _id: owner } = req.user;
+    const result = await Contact.findOneAndDelete({ _id: id, owner });
     if (!result) {
         throw HttpError(404, "Not found")
     }
@@ -48,12 +51,9 @@ const removeContact = async (req, res, next) => {
 };
 
 const updateStatusContact = async (req, res) => {
-    const { error } = contactFavoriteSchemaJoi.validate(req.body);
-    if (error) {
-        throw HttpError(400, error.message)
-    }
     const { id } = req.params;
-    const result = await Contact.findByIdAndUpdate(id, req.body);
+    const { _id: owner } = req.user;
+    const result = await Contact.findOneAndUpdate({ _id: id, owner }, req.body);
     if (!result) {
         throw HttpError(404, "Not found")
     }
