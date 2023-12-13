@@ -33,8 +33,6 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     const { email, password } = req.body;
-    console.log(res)
-
     const user = await User.findOne({ email });
     if (!user) {
         throw HttpError(401, "Email or password is wrong");
@@ -76,7 +74,6 @@ const logout = async (req, res) => {
 
 const updateSubscription = async (req, res) => {
     const { _id, email } = req.user;
-    console.log(req.body)
     const userUpdate = await User.findByIdAndUpdate(_id, req.body)
     res.json({
         email,
