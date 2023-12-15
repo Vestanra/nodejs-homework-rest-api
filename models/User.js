@@ -17,6 +17,14 @@ const userSchemaMngs = new Schema({
         enum: ["starter", "pro", "business"],
         default: "starter"
     },
+    verify: {
+        type: Boolean,
+        default: false,
+    },
+    verificationToken: {
+        type: String,
+        required: [false, 'Verify token is required'],
+    },
     avatarURL: String,
     token: String,
 }, { versionKey: false, timestamps: true, });
@@ -33,6 +41,10 @@ export const userSchemaJoi = Joi.object({
 
 export const subscriptionUpdateJoi = Joi.object({
     subscription: Joi.valid("starter", "pro", "business").required(),
+})
+
+export const verifyJoi = Joi.object({
+    email: Joi.string().required().messages({ "any.required": "missing required email field" }),
 })
 
 export const User = model("user", userSchemaMngs);
