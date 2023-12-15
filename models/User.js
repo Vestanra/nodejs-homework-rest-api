@@ -17,6 +17,7 @@ const userSchemaMngs = new Schema({
         enum: ["starter", "pro", "business"],
         default: "starter"
     },
+    avatarURL: String,
     token: String,
 }, { versionKey: false, timestamps: true, });
 
@@ -30,7 +31,7 @@ export const userSchemaJoi = Joi.object({
     subscription: Joi.valid("starter", "pro", "business").default("starter"),
 });
 
-export const userSubscriptionUpdateJoi = Joi.object({
+export const subscriptionUpdateJoi = Joi.object({
     subscription: Joi.valid("starter", "pro", "business").required(),
 })
 

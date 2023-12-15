@@ -1,8 +1,8 @@
 import express from "express";
 import authController from "../../controllers/auth-controller.js";
-import { authenticate, isEmptyBody } from "../../middlewares/index.js";
+import { authenticate, isEmptyBody, uploadMulter } from "../../middlewares/index.js";
 import { validateBody } from "../../decorators/index.js";
-import { userSchemaJoi, userSubscriptionUpdateJoi } from "../../models/User.js";
+import { userSchemaJoi, subscriptionUpdateJoi } from "../../models/User.js";
 
 const authRouter = express.Router();
 
@@ -14,6 +14,8 @@ authRouter.get('/current', authenticate, authController.getCurrent)
 
 authRouter.post('/logout', authenticate, authController.logout)
 
-authRouter.patch('/', authenticate, isEmptyBody, validateBody(userSubscriptionUpdateJoi), authController.updateSubscription)
+authRouter.patch('/', authenticate, isEmptyBody, validateBody(subscriptionUpdateJoi), authController.updateSubscription)
+
+authRouter.patch('/avatars', authenticate, uploadMulter.single("avatar"), authController.updateAvatar)
 
 export default authRouter;
